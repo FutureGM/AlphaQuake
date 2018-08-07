@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.dot {
+  fill: rgb(70, 180, 180);
+  stroke: rgb(20, 30, 165);
+}
+  
+.dot:hover {
+  fill: rgba(255, 251, 0, 0.918);
+}
+  
+div.tooltip {   
+  position: absolute;     
+  text-align: center;
+  vertical-align: top;   
+  width: 100px;                  
+  height: 25px;                 
+  padding: 5px; 
+  color: #000000;          
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 50%;
+  background: rgb(221, 123, 123);
+  box-shadow: 4px 4px 2px rgba(0, 0, 0, 0.4);
+  border: 2px;  
+  border-radius: 2px;  
+  pointer-events: none;                  
+} 
+  
+</style>
+<body>
+<svg width="960" height="500"></svg>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script>
+// Define the tooltip for hover-over info windows
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+  
+// Set the dimensions and margins of the graph
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 60, left: 60},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+// Set the ranges
+var x = d3.scaleTime().rangeRound([0, width]),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+// Append the SVG element with a g element
+// to offset the origin of the chart area by
+// the top-left margin
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// USGS Real-Time Earthquake Feed
+//var usgs = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+var usgs = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-06-02&endtime=2018-06-01&minmagnitude=5"
+// var formatTime = d3.timeFormat("%B %d, %Y");
+var formatTime = d3.timeFormat("%B %Y");
+var time;
+var jsonData;
+var y;
+var x;
+// Create the scatterplot with the scatterplot data
+var scatterplot ="/scatterplot"
+d3.json(scatterplot, function(error, data) {
+  if (error) console.log(error);
+  console.log(data);
+  jsonData = data;
+  // Filter and format the data for use in the range
+  //Y-Axis Properties
+  magnitude = data.features.map(function (d) { return d.properties.mag; });
+  //X-Axis Properties
+  time = data.features.map(function(d) {return d.properties.time;});
+  depth = data.features.map(function (d) { return d.geometry.coordinates[2]; });
+  years = data.features.map(function (d) {return d.properties.place;});
+  intensity = data.features.map(function (d) {return d.properties.place;});
+  
+  
+  //t == time
+  var timeScale = []
+  for (var t=0; t < 500; t++) {
+    timeScale[t] = time[t];
+  }
+  // Scale the range of the data from the minimum value
+  // to the maximum value
+  x.domain([d3.min(time)-1, d3.max(time)+1]);
+  y.domain([d3.min(magnitude)-1, d3.max(magnitude)+1]);
+  
+  // Add the X-Axis
+  g.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    // .call(d3.axisBottom(x).ticks(20));
+    .call(d3.axisBottom(x).tickFormat(formatTime));
+  
+  // Add a label for the X-Axis
+  g.append("text")
+    .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
+    .style("text-anchor", "middle")
+    .style("font-size", "15px")
+    .text("Time");
+  
+  // Add the Y-Axis
+  g.append("g")
+    .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y).ticks(10));
+  
+  // Add a label for the Y-Axis
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", ".75em")
+    .style("text-anchor", "middle")
+    .style("font-size", "15px")
+    .text("Magnitude");
+  // Add the dots to the scatterplot with the tooltip
+  g.selectAll(".dot")
+    .data(data.features)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", 10 ) //function (d) { return y(d.properties.mag) / 40; })
+      .attr("cx", function(d) { return x(d.properties.time)})
+      .attr("cy", function(d) { return y(d.properties.mag); })
+      .on("mouseover", function(d) {
+        console.log("----------------------------------")
+        console.log("d    ----------------------------------")
+        console.log(d)
+        console.log("----------------------------------")
+        div.transition()
+          .duration(200)
+          .style("opacity", .9)
+          .style("stroke", "black");
+        div.html("<b><u>Mag</b></u>: " + d.properties.mag 
+        + "<br/>" 
+        + "<br/>" 
+        + "<br/>" 
+        + "<b><u>Depth</b></u>: " + d.geometry.coordinates[2] + "km")
+          .style("left", (d3.event.pageX + 10) + "px")
+          .style("top", (d3.event.pageY - 30) + "px");
+      })
+      .on("mouseout", function(d) {
+        div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+});
+</script>
+</body>
+</html>

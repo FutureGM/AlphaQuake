@@ -1,0 +1,62 @@
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Earthquakes</title>
+  <!-- kills favicon.ico 404 error -->
+  <link rel="icon" href="data:;base64,iVBORwOKGO=">
+
+  <!-- Latest compiled and minified CSS & JS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+
+  <!--D3 CDN-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="static/css/style2.css">
+
+</head>
+
+<body>
+  <!--Form to select maps-->
+  <select id="mySelect">
+    <!-- Div for Map -->
+    <option value="na">North America</option>
+    <option value="sa">South America</option>
+    <option value="asia">Asia</option>
+    <option value="africa">Africa</option>
+    <option value="ant">Antartica</option>
+    <option value="eur">Europe</option>
+    <option value="aus">Australia</option>
+    <option value="map">World</option>
+  </select>
+  <p>Click the button to change the selected continent</p>
+
+  <button type="button" onclick="myFunction()">Visualize Me!</button>
+
+  <script>
+    function myFunction() {
+      const place  = document.getElementById("mySelect").value;
+      console.log("place")
+      console.log(place)
+    }
+  </script>
+  <div id="mapsearch">
+    <div id="map"></div>
+  </div>
+  <!-- JavaScript -->
+  <script src=""
+  <script src="static/js/heatmap.js"></script>
+
+</body>
+
+</html>
