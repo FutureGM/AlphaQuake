@@ -1,17 +1,16 @@
 //----------------------------------------------------------------------------
 // Variables for API endpoints
 //----------------------------------------------------------------------------
-var earthquakeURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+var earthquakeURL = "/earthquakedata";
 
 //----------------------------------------------------------------------------
 // Calls function to render map
 //----------------------------------------------------------------------------
 renderMap(earthquakeURL);
-
 //----------------------------------------------------------------------------
 // Function to render map
 //----------------------------------------------------------------------------
-function renderMap(earthquakeURL, place) {
+function renderMap(earthquakeURL) {
 
   // Performs GET request for the earthquake URL
   d3.json(earthquakeURL, function(data) {
@@ -34,9 +33,13 @@ function renderMap(earthquakeURL, place) {
           });
       };
 
+    //   function cluster(feature, layer){
+    //       return L.markerClusterGroup()
+    //   };
+      
       function onEachEarthquake(feature, layer) {
-        layer.bindPopup("<h3>" + feature.properties.place + "</h3>" 
-          + "<hr><p>Magnitude: " + feature.properties.mag + "</p>" + "<hr><p>Date: " + feature.properties.date + "</p>");
+        layer.bindPopup("<hr><h3>" + feature.properties.place + "</h3>" 
+            + "<hr><p>Magnitude: " + feature.properties.mag + "</p>");
       };
 
       // Creates a GeoJSON layer containing the features array of the earthquakeData object
@@ -45,6 +48,8 @@ function renderMap(earthquakeURL, place) {
         onEachFeature: onEachEarthquake,
         pointToLayer: onEachQuakeLayer
       });
+
+    //   cluster.addLayer(earthquakes);
 
       // Sends earthquakes, fault lines and timeline layers to the createMap function
       createMap(earthquakes);
@@ -79,7 +84,7 @@ function renderMap(earthquakeURL, place) {
       // Create map, default settings: outdoors and faultLines layers display on load
       var map = L.map("map", {
           center: [39.8283, -98.5785],
-          zoom: 3,
+          zoom: 3.5,
           layers: [satellite,earthquakes],
           scrollWheelZoom: false
       });
@@ -94,15 +99,12 @@ function renderMap(earthquakeURL, place) {
       // Adds Legend
       var legend = L.control({position: 'bottomright'});
       legend.onAdd = function(map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            var title = ["Magnitudes"];
-            var grades = [0, 1, 2, 3, 4, 5];
-            // labels = ["0-1", "1-2", "2-3", "3-4", "4-5", "5+"];
+          var div = L.DomUtil.create('div', 'info legend'),
+                      grades = [0, 1, 2, 3, 4, 5],
+                      labels = ["0-1", "1-2", "2-3", "3-4", "4-5", "5+"];
 
           for (var i = 0; i < grades.length; i++) {
-              div.innerHTML += 
-              '<i style="background:' + chooseColor(grades[i] + 1) 
-              + '"></i> ' +
+              div.innerHTML += '<i style="background:' + chooseColor(grades[i] + 1) + '"></i> ' +
               grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
           };
 
@@ -135,3 +137,13 @@ return magnitude > 5 ? "red":
 function markerSize(magnitude) {
   return magnitude * 2;
 };
+//----------------------------------------------------------------------------
+// Function to display TABLEAU
+//----------------------------------------------------------------------------
+function initViz() {
+	var containerDiv = document.getElementById("tableauViz");
+	var url = "https://public.tableau.com/shared/X6J8BKPDZ?:display_count=yes";
+	var viz = new tableau.Viz(containerDiv, url); 
+};
+initViz();
+//----------------------------------------------------------------------------
